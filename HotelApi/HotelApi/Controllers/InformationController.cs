@@ -96,6 +96,86 @@ namespace HotelApi.Controllers
         }
 
 
+        [HttpPost]
+        [Route("api/GetRegistroUser")]
+        public Mensajes GetRegistroUser(Usuario Parametros)
+        {
+            Usuario Us = new Usuario();
+            int error = 0;
+            string Org = "";
+            try { Us.UserName = Helper.CreateMD5(Parametros.Mail); } catch (Exception) { error = 1; Org = Org+"UserName"; }
+            try { Us.UserPass = Helper.CreateMD5(Parametros.UserPass); } catch (Exception) { error = 1; Org = Org + "UserPass"; }
+            try { Us.Nombre = Parametros.Nombre; } catch (Exception) { error = 1; Org = Org + "Nombre"; }
+            try { Us.Apellido_Pat = Parametros.Apellido_Pat; } catch (Exception) { error = 1; Org = Org + "ApPat"; }
+            try { Us.Apellido_Mat = Parametros.Apellido_Mat; } catch (Exception) { error = 1; Org = Org + "ApMat"; }
+            try { Us.TipoDocument = Parametros.TipoDocument; } catch (Exception) { error = 1; Org = Org + "TpoDoc"; }
+            try { Us.NumDocument = Parametros.NumDocument; } catch (Exception) { error = 1; Org = Org + "NumDoc"; }
+            try { Us.Direccion = Parametros.Direccion; } catch (Exception) { error = 1; Org = Org + "Direc"; }
+            try { Us.Distrito = Parametros.Distrito; } catch (Exception) { error = 1; Org = Org + "Distrito"; }
+            try { Us.Provincia = Parametros.Provincia; } catch (Exception) { error = 1; Org = Org + "Provincia"; }
+            try { Us.Telefono = Parametros.Nombre; } catch (Exception) { error = 1; Org = Org + "Telef"; }
+            try { Us.Mail = Parametros.Nombre; } catch (Exception) { error = 1; Org = Org + "Mail"; }
+
+
+            Mensajes msn = new Mensajes();
+
+            if (error != 1)
+            {
+                string Rsl = Modelo.SetUsuario(Us);
+                msn.Description = "Modelo";
+                msn.Origen = "Insercion";
+                msn.Value = Rsl;
+            }
+            else
+            {
+                msn.Description = "Transaccion";
+                msn.Origen = "Usuario";
+                msn.Value = Org;
+            }
+
+            return msn;
+        }
+
+        [HttpPost]
+        [Route("api/GetLoginUsuario")]
+        public Mensajes GetLoginUsuario(Usuario Parametros)
+        {
+            Usuario Us = new Usuario();
+            Mensajes msn = new Mensajes();
+
+            try { Us.UserName = Helper.CreateMD5(Parametros.UserName); } catch (Exception) { Us.UserName = ""; }
+            try { Us.UserPass = Helper.CreateMD5(Parametros.UserPass); } catch (Exception) { Us.UserPass = ""; }
+            string token = ""; //GetToken
+
+            if (Us.UserName!="" && Us.UserPass != "")
+            {
+                Usuario rsl = Modelo.GetSesionUser(Us);
+                if(rsl != null)
+                {
+                    token = Helper.GetToken();
+                    Modelo.SetTokenUser(rsl.Id,token);
+                    msn.Token = token;
+                    msn.Description = rsl.Nombre;
+                    msn.Value = rsl.Id.ToString();
+                }
+                else
+                {
+                    msn.Description = "Not User";
+                    msn.Origen = "Sesion";
+                    msn.Value = "NA";
+                }
+            }
+            else
+            {
+                msn.Description = "Error toma de datos";
+                msn.Origen = "Sesion";
+                msn.Value = "null";
+            }
+            
+            return msn;
+        }
+
+
 
     }
 }

@@ -80,8 +80,98 @@ namespace HotelApi.Model
             return result;
         }
 
+        public string SetUsuario(Usuario data)
+        {
+            try
+            {
+                var cn = Cnx.GetConnection();
+                cn.Open();
+                string query = @"insert into tbl_user 
+                            (USER_NAME,USER_PASSWORD,USER_NAMES,USER_APEPAT,USER_APEMAT,USER_TPODOC,USER_NUMDOC,USER_DIRECCION,USER_DISTRITO,USER_PROVINCIA,USER_TELEF,USER_MAIL,ROL_TYPE)
+                            VALUES
+                            (@userName,@userPass,@nombres,@apePat,@apeMat,@tipoDoc,@numDoc,@direccion,@distrito,@provincia,@telef,@mail,@tipo)";
+                MySqlCommand cmd = new MySqlCommand(query, cn);
+                cmd.Parameters.AddWithValue("@userName", data.UserName);
+                cmd.Parameters.AddWithValue("@userPass", data.UserPass);
+                cmd.Parameters.AddWithValue("@nombres", data.Nombre);
+                cmd.Parameters.AddWithValue("@apePat", data.Apellido_Mat);
+                cmd.Parameters.AddWithValue("@apeMat", data.Apellido_Pat);
+                cmd.Parameters.AddWithValue("@tipoDoc", data.TipoDocument);
+                cmd.Parameters.AddWithValue("@numDoc", data.NumDocument);
+                cmd.Parameters.AddWithValue("@direccion", data.Direccion);
+                cmd.Parameters.AddWithValue("@distrito", data.Distrito);
+                cmd.Parameters.AddWithValue("@provincia", data.Provincia);
+                cmd.Parameters.AddWithValue("@telef", data.Telefono);
+                cmd.Parameters.AddWithValue("@mail", data.Mail);
+                cmd.Parameters.AddWithValue("@tipo", 2);
 
+                cmd.ExecuteNonQuery();
+                cn.Close();
+                return "Done";
+            }
+            catch (Exception e)
+            {
+                return "Error:" + e.ToString();
+            }
+            
+        }
 
+        public Usuario GetSesionUser(Usuario data)
+        {
+            try
+            {
+                List<Usuario> lista = new List<Usuario>();
+                var cn = Cnx.GetConnection();
+                cn.Open();
+                string query = @"select
+                                USER_ID as 'Id',
+                                USER_NAMES as 'Nombre'
+                             from tbl_user
+                             where USER_NAME=@user AND  USER_PASSWORD=@pass
+                            ";
+
+                MySqlCommand cmd = new MySqlCommand(query, cn);
+                cmd.Parameters.AddWithValue("@user", data.UserName);
+                cmd.Parameters.AddWithValue("@pass", data.UserPass);
+                MySqlDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    //Console.WriteLine(dr.GetInt32(0) + "/" + dr.GetString(1));
+                    Usuario rs = new Usuario();
+                    try { rs.Id = dr.GetInt32(0); } catch (Exception) { rs.Id = 0; }
+                    try { rs.Nombre = dr.GetString(1); } catch (Exception) { rs.Nombre = ""; }
+                    lista.Add(rs);
+                }
+                cn.Close();
+
+                return lista.Single();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            
+        }
+        public string SetTokenUser(int Id,string Token)
+        {
+            try
+            {
+                var cn = Cnx.GetConnection();
+                cn.Open();
+                string query = @"update tbl_user set USER_TOKEN=@tkn where USER_ID=@idt ";
+                MySqlCommand cmd = new MySqlCommand(query, cn);
+                cmd.Parameters.AddWithValue("@userName", Token);
+                cmd.Parameters.AddWithValue("@idt", Id);
+                cmd.ExecuteNonQuery();
+                cn.Close();
+                return "Done";
+            }
+            catch (Exception e)
+            {
+                return "Error:" + e.ToString();
+            }
+
+        }
 
     }
 }
