@@ -17,6 +17,14 @@ namespace HotelApi.Model
             string password = "";
             string port = "3306";
             string sslM = "none";
+
+            //string server = "mysqltelos.mysql.database.azure.com";
+            //string database = "upc_hotel";
+            //string user = "telosDb";
+            //string password = "iRkB@xcjXp&2";
+            //string port = "3306";
+            //string sslM = "none";
+
             string connString = String.Format("server={0};port={1};user id={2}; password={3}; database={4}; SslMode={5}", server, port, user, password, database, sslM);
             MySqlConnection cn = new MySqlConnection(connString);
             return cn;

@@ -33,11 +33,13 @@ namespace HotelApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "HotelApi", Version = "v1" });
             });
-            services.AddCors(options => {
-                //options.AddPolicy(name: _MyCors, builder => { builder.AllowAnyOrigin("*") });
-                options.AddPolicy(name: _MyCors, builder => { builder.SetIsOriginAllowed(org => new Uri(org).Host == "localhost").AllowAnyHeader().AllowAnyMethod(); 
-                });
-            });
+            //services.AddCors(options => {
+            //options.AddPolicy(name: _MyCors, builder => { builder.AllowAnyOrigin("*"); });
+            //options.AddPolicy(name: _MyCors, builder => { builder.SetIsOriginAllowed(org => new Uri(org).Host == "*").AllowAnyHeader().AllowAnyMethod(); 
+            //});
+
+            //});
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -53,7 +55,14 @@ namespace HotelApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
-            app.UseCors(_MyCors);
+            //app.UseCors(_MyCors);
+            app.UseCors(builder =>
+            {
+                builder
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+            });
 
             app.UseAuthorization();
 

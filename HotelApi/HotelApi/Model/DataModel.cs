@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Threading.Tasks;                                                           
 using HotelApi.Objetos;
 using MySql.Data.MySqlClient;
 
@@ -11,14 +11,14 @@ namespace HotelApi.Model
     {
         ConexionModel Cnx = new ConexionModel();
 
-        public List<Habitacion> GetHabitaciones(string inicio,string fin,int personas)
+        public List<Habitacion> GetHabitaciones(int personas)
         {
             List<Habitacion> lista = new List<Habitacion>();
             var cn = Cnx.GetConnection();
             cn.Open();
             string query = @"select hb.ROOM_ID as 'Id',tp.TYPE_NAME as 'Titulo',hb.ROOM_INFO1 as 'Descripcion' 
                                 from tbl_habitacion hb inner join tbl_tipo_habitacion tp on tp.TYPE_ID=hb.ROOM_TYPE 
-                                WHERE hb.START_AVAILABILITY ='"+ inicio + "' and hb.END_AVAILABILITY='" + fin + "' and tp.NUMBER_PEOPLE="+personas;
+                                WHERE tp.NUMBER_PEOPLE="+personas;
 
             MySqlCommand cmd = new MySqlCommand(query,cn);
             MySqlDataReader dr = cmd.ExecuteReader();
@@ -34,6 +34,49 @@ namespace HotelApi.Model
             cn.Close();
             return lista;
         }
+
+        public List<Habitacion> GetHabitacionesFiltradas(List<Habitacion> Hab, string inicio)
+        {
+            List<Habitacion> lista = new List<Habitacion>();
+            int ext = 0;
+            foreach(var dato in Hab)
+            {
+                ext = this.BuscaDisponibilidadHab(dato.Id, inicio);
+                if (ext == 0)
+                {
+                    Habitacion h = new Habitacion();
+                    try { h.Id = dato.Id; } catch (Exception) { h.Id = 0; }
+                    try { h.Titulo = dato.Titulo; } catch (Exception) { h.Titulo = ""; }
+                    try { h.Descripcion = dato.Descripcion; } catch (Exception) { h.Descripcion = ""; }
+                    try { h.Img = dato.Img; } catch (Exception) { h.Img = ""; }
+                    lista.Add(h);
+                }
+            }
+            return lista;
+        }
+
+
+        public int BuscaDisponibilidadHab(int id,string inicio)
+        {
+            int rsl = 0;
+            List<int> lista = new List<int>();
+            var cn = Cnx.GetConnection();
+            cn.Open();
+            string query = @"SELECT rs.DETAIL_ID FROM tbl_reserva rs WHERE '"+ inicio + @"' BETWEEN rs.ENTRY_DATE AND rs.DEPARTURE_DATE AND rs.ROOM_ID=" + id;
+            MySqlCommand cmd = new MySqlCommand(query, cn);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            
+            while (dr.Read())
+            {
+                int itm = 0;
+                try { itm = dr.GetInt32(0); } catch (Exception) { itm = 0; }
+                lista.Add(itm);
+            }
+            cn.Close();
+            try { rsl = lista.Count(); } catch (Exception) { rsl = 0; }
+            return rsl;
+        }
+
 
 
 
@@ -160,7 +203,7 @@ namespace HotelApi.Model
                 cn.Open();
                 string query = @"update tbl_user set USER_TOKEN=@tkn where USER_ID=@idt ";
                 MySqlCommand cmd = new MySqlCommand(query, cn);
-                cmd.Parameters.AddWithValue("@userName", Token);
+                cmd.Parameters.AddWithValue("@tkn", Token);
                 cmd.Parameters.AddWithValue("@idt", Id);
                 cmd.ExecuteNonQuery();
                 cn.Close();
@@ -171,6 +214,142 @@ namespace HotelApi.Model
                 return "Error:" + e.ToString();
             }
 
+        }
+
+        public string SetReserva(Reserva data)
+        {
+            try
+            {
+                var cn = Cnx.GetConnection();
+                cn.Open();
+                string query = @"insert into tbl_reserva 
+                            (TOTAL_PRICE,ENTRY_DATE,DEPARTURE_DATE,DETAIL_COMMENT,HUESPEDES,ADMIN_ID ,CLIENT_ID ,ROOM_ID ,USER_ID )
+                            VALUES
+                            (@total,@entrada,@salida,@coment,@huepedes,@admin,@cliente,@room,@user)";
+                MySqlCommand cmd = new MySqlCommand(query, cn);
+                cmd.Parameters.AddWithValue("@total", data.Monto);
+                cmd.Parameters.AddWithValue("@entrada", data.Inicio);
+                cmd.Parameters.AddWithValue("@salida", data.Fin);
+                cmd.Parameters.AddWithValue("@coment", "Ninguno");
+                cmd.Parameters.AddWithValue("@admin", 1);
+                cmd.Parameters.AddWithValue("@cliente",1);
+                cmd.Parameters.AddWithValue("@user", data.Usuario);
+                cmd.Parameters.AddWithValue("@room", data.Room);
+                cmd.Parameters.AddWithValue("@huepedes", data.Huespedes);
+                //cmd.Parameters.AddWithValue("@date", data.Hoy);
+                cmd.ExecuteNonQuery();
+                cn.Close();
+                return "Done";
+            }
+            catch (Exception e)
+            {
+                return "Error:" + e.ToString();
+            }
+
+        }
+
+        public string VerifyToken(int user,string token)
+        {
+            try
+            {
+                List<Usuario> lista = new List<Usuario>();
+                var cn = Cnx.GetConnection();
+                cn.Open();
+                string query = @"SELECT us.USER_ID FROM tbl_user us 
+                                WHERE us.USER_ID=@id AND us.USER_TOKEN=@tk 
+                            ";
+
+                MySqlCommand cmd = new MySqlCommand(query, cn);
+                cmd.Parameters.AddWithValue("@id", user);
+                cmd.Parameters.AddWithValue("@tk", token);
+                MySqlDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    Usuario rs = new Usuario();
+                    try { rs.Id = dr.GetInt32(0); } catch (Exception) { rs.Id = 0; }
+                    lista.Add(rs);
+                }
+                cn.Close();
+
+                if (lista.Count() > 0)
+                {
+                    return "True";
+                }
+                else
+                {
+                    return "False";
+                }
+                
+            }
+            catch (Exception)
+            {
+                return "False";
+            }
+        }
+
+        public string GestionPagos(Reserva data)
+        {
+            return "TRUE";
+        }
+
+        public Usuario GetMailUser(int Idt)
+        {
+            try
+            {
+                List<Usuario> lista = new List<Usuario>();
+                var cn = Cnx.GetConnection();
+                cn.Open();
+                string query = @"SELECT us.USER_ID , us.USER_MAIL,us.USER_NAME,us.USER_APEPAT FROM tbl_user us WHERE us.USER_ID=@idt";
+                MySqlCommand cmd = new MySqlCommand(query, cn);
+                cmd.Parameters.AddWithValue("@idt", Idt);
+                MySqlDataReader dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    //Console.WriteLine(dr.GetInt32(0) + "/" + dr.GetString(1));
+                    Usuario rs = new Usuario();
+                    try { rs.Id = dr.GetInt32(0); } catch (Exception) { rs.Id = 0; }
+                    try { rs.Mail = dr.GetString(1); } catch (Exception) { rs.Mail = ""; }
+                    try { rs.Nombre = dr.GetString(2); } catch (Exception) { rs.Mail = ""; }
+                    try { rs.Apellido_Pat = dr.GetString(3); } catch (Exception) { rs.Mail = ""; }
+                    lista.Add(rs);
+                }
+                cn.Close();
+
+                return lista.Single();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+        }
+
+        public List<Reporte> GetReporteReserva(int idt)
+        {
+            List<Reporte> result = new List<Reporte>();
+            var cn = Cnx.GetConnection();
+            cn.Open();
+            string query = @"SELECT tp.TYPE_NAME,hb.ROOM_INFO1,rs.ENTRY_DATE,rs.DEPARTURE_DATE,rs.HUESPEDES,rs.TOTAL_PRICE 
+                            FROM tbl_reserva rs 
+                            INNER JOIN tbl_habitacion hb ON hb.ROOM_ID=rs.ROOM_ID 
+                            INNER JOIN tbl_tipo_habitacion tp on tp.TYPE_ID=hb.ROOM_TYPE 
+                            WHERE USER_ID="+ idt;
+
+            MySqlCommand cmd = new MySqlCommand(query, cn);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                Reporte rp = new Reporte();
+                try { rp.Habitacion = dr.GetString(0); } catch (Exception) { rp.Habitacion = ""; }
+                try { rp.Descripcion = dr.GetString(1); } catch (Exception) { rp.Descripcion = ""; }
+                try { rp.Entrada = dr.GetString(2); } catch (Exception) { rp.Entrada = ""; }
+                try { rp.Salida = dr.GetString(3); } catch (Exception) { rp.Salida = ""; }
+                try { rp.Huespedes = dr.GetInt32(4); } catch (Exception) { rp.Huespedes = 0; }
+                try { rp.Total = dr.GetDecimal(5); } catch (Exception) { rp.Total = 0; }
+                result.Add(rp);
+            }
+            cn.Close();
+            return result;
         }
 
     }

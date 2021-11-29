@@ -10,5 +10,6 @@ namespace HotelApi.Objetos
         public int Id { get; set; }
         public string RangeDate { get; set; }
         public int Personas { get; set; }
+
     }
 }
