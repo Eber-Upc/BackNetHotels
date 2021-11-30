@@ -1,0 +1,19 @@
+.credit-card-div  span { padding-top:10px; }
+.credit-card-div img { padding-top:30px; }
+.credit-card-div .small-font { font-size:9px; }
+.credit-card-div .pad-adjust { padding-top:10px; }
+
+.jumbotron {
+    background-color: rgba(189, 195, 199,0.5);
+    padding: 30px;
+}
+
+.pb-3{
+    display: none;
+}
+
+.linkSession{
+    font-size: 16px;
+    color: blue;
+    font-weight: bold;
+}

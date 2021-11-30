@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+
+
+
+<script>
+    EjecucionBuscar();
+    function EjecucionBuscar() {
+        let fechas = localStorage.getItem("Reserv");
+        let Personas = localStorage.getItem("Huespedes");
+        console.log(fechas);
+        console.log(Personas);
+        var params = {
+            RangeDate: "29/11/2021 - 03/12/2021",
+            Personas: 2
+        };
+        var xmlhttp = new XMLHttpRequest();
+        var theUrl = "/api/GetHabitacionesDisponibles";
+        xmlhttp.open("POST", theUrl);
+        xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlhttp.send(JSON.stringify(params));
+        xmlhttp.responseType = 'json';
+        xmlhttp.onload = function () {
+            if (xmlhttp.status != 200) {
+                console.log("Error")
+                console.log(xmlhttp)
+                page("/");
+            } else {
+                console.log(xmlhttp.response);
+                ListarRooms(xmlhttp.response);
+            }
+        };
+    }
+
+</script>

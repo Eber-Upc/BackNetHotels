@@ -1,0 +1,10 @@
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\Objetos\bin\Debug\netcoreapp3.1\Objetos.deps.json
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\Objetos\bin\Debug\netcoreapp3.1\Objetos.dll
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\Objetos\bin\Debug\netcoreapp3.1\Objetos.pdb
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\Objetos\obj\Debug\netcoreapp3.1\Objetos.csproj.AssemblyReference.cache
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\Objetos\obj\Debug\netcoreapp3.1\Objetos.GeneratedMSBuildEditorConfig.editorconfig
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\Objetos\obj\Debug\netcoreapp3.1\Objetos.AssemblyInfoInputs.cache
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\Objetos\obj\Debug\netcoreapp3.1\Objetos.AssemblyInfo.cs
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\Objetos\obj\Debug\netcoreapp3.1\Objetos.csproj.CoreCompileInputs.cache
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\Objetos\obj\Debug\netcoreapp3.1\Objetos.dll
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\Objetos\obj\Debug\netcoreapp3.1\Objetos.pdb
