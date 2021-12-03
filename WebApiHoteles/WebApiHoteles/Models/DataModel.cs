@@ -298,7 +298,7 @@ namespace WebApiHoteles.Models
                 List<Usuario> lista = new List<Usuario>();
                 var cn = Cnx.GetConnection();
                 cn.Open();
-                string query = @"SELECT us.USER_ID , us.USER_MAIL,us.USER_NAME,us.USER_APEPAT FROM tbl_user us WHERE us.USER_ID=@idt";
+                string query = @"SELECT us.USER_ID , us.USER_MAIL,us.USER_NAMES,us.USER_APEPAT FROM tbl_user us WHERE us.USER_ID=@idt";
                 MySqlCommand cmd = new MySqlCommand(query, cn);
                 cmd.Parameters.AddWithValue("@idt", Idt);
                 MySqlDataReader dr = cmd.ExecuteReader();
@@ -345,6 +345,102 @@ namespace WebApiHoteles.Models
                 try { rp.Salida = dr.GetString(3); } catch (Exception) { rp.Salida = ""; }
                 try { rp.Huespedes = dr.GetInt32(4); } catch (Exception) { rp.Huespedes = 0; }
                 try { rp.Total = dr.GetDecimal(5); } catch (Exception) { rp.Total = 0; }
+                result.Add(rp);
+            }
+            cn.Close();
+            return result;
+        }
+
+
+
+        public List<Reserva> GetReservasToChkng()
+        {
+            List<Reserva> result = new List<Reserva>();
+            var cn = Cnx.GetConnection();
+            cn.Open();
+            string query = @"SELECT 
+                            tp.TYPE_NAME,rs.ENTRY_DATE,rs.DEPARTURE_DATE,rs.HUESPEDES,rs.DATE_RESERVA,us.USER_NAMES,us.USER_APEPAT,
+                            rs.TOTAL_PRICE,hb.ROOM_NUMBER,est.DESCRIPTION,rs.DETAIL_ID
+                            FROM tbl_reserva rs
+                            inner join tbl_estado est on est.ID_STATUS=rs.ESTADO
+                            inner join tbl_habitacion hb on hb.ROOM_ID=rs.ROOM_ID
+                            inner join tbl_tipo_habitacion tp on tp.TYPE_ID=hb.ROOM_TYPE
+                            inner join tbl_user us on us.USER_ID=rs.USER_ID where rs.ESTADO!=3";
+
+            MySqlCommand cmd = new MySqlCommand(query, cn);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                Reserva rp = new Reserva();
+                try { rp.Habitacion = dr.GetString(0); } catch (Exception) { rp.Habitacion = ""; }
+                try { rp.Inicio = dr.GetString(1); } catch (Exception) { rp.Inicio = ""; }
+                try { rp.Fin = dr.GetString(2); } catch (Exception) { rp.Fin = ""; }
+                try { rp.Huespedes = dr.GetInt32(3); } catch (Exception) { rp.Huespedes = 0; }
+                try { rp.FechaReserva = dr.GetString(4); } catch (Exception) { rp.FechaReserva = ""; }
+                try { rp.Nombres = dr.GetString(5); } catch (Exception) { rp.Nombres = ""; }
+                try { rp.Apellidos = dr.GetString(6); } catch (Exception) { rp.Apellidos = ""; }
+                try { rp.Monto = dr.GetDecimal(7); } catch (Exception) { rp.Monto = 0; }
+                try { rp.Room = dr.GetInt32(8); } catch (Exception) { rp.Room = 0; }
+                try { rp.Estado = dr.GetString(9); } catch (Exception) { rp.Estado = ""; }
+                try { rp.Id = dr.GetInt32(10); } catch (Exception) { rp.Id = 0; }
+                result.Add(rp);
+            }
+            cn.Close();
+            return result;
+        }
+
+        public string SetClienteToCheking(Cliente data)
+        {
+            try
+            {
+                var cn = Cnx.GetConnection();
+                cn.Open();
+                string query = @"
+                INSERT INTO  tbl_cliente (CLIENT_NAMES,CLIENT_APEPAT,CLIENT_APEMAT,CLIENT_EMAIL,CLIENT_DOCUMENT,CLIENT_TELEPHONE,CLIENT_AGE,RESERVA)
+                VALUES (@nombre,@apepat,@apeMat,@email,@doc,@fono,@age,@rsv)
+                ";
+                MySqlCommand cmd = new MySqlCommand(query, cn);
+                cmd.Parameters.AddWithValue("@nombre", data.Nombre);
+                cmd.Parameters.AddWithValue("@apepat", data.ApellidoP);
+                cmd.Parameters.AddWithValue("@apeMat", data.ApellidoM);
+                cmd.Parameters.AddWithValue("@email", data.Mail);
+                cmd.Parameters.AddWithValue("@doc", data.Documento);
+                cmd.Parameters.AddWithValue("@fono", data.Celular);
+                cmd.Parameters.AddWithValue("@age", 0);
+                cmd.Parameters.AddWithValue("@rsv", data.Reserva);
+
+                cmd.ExecuteNonQuery();
+                cn.Close();
+                return "Done";
+            }
+            catch (Exception e)
+            {
+                return "Error:" + e.ToString();
+            }
+
+        }
+        public List<Cliente> GetListaCliente(int rsv)
+        {
+            List<Cliente> result = new List<Cliente>();
+            var cn = Cnx.GetConnection();
+            cn.Open();
+            string query = @"SELECT 
+                            cl.CLIENT_ID,cl.CLIENT_NAMES,cl.CLIENT_APEPAT,cl.CLIENT_APEMAT,cl.CLIENT_EMAIL,cl.CLIENT_DOCUMENT,cl.CLIENT_TELEPHONE	
+                            FROM tbl_cliente cl
+                            where cl.RESERVA="+ rsv;
+
+            MySqlCommand cmd = new MySqlCommand(query, cn);
+            MySqlDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                Cliente rp = new Cliente();
+                try { rp.Id = dr.GetInt32(0); } catch (Exception) { rp.Id = 0; }
+                try { rp.Nombre = dr.GetString(1); } catch (Exception) { rp.Nombre = ""; }
+                try { rp.ApellidoP = dr.GetString(2); } catch (Exception) { rp.ApellidoP = ""; }
+                try { rp.ApellidoM = dr.GetString(3); } catch (Exception) { rp.ApellidoM = ""; }
+                try { rp.Mail = dr.GetString(4); } catch (Exception) { rp.Mail = ""; }
+                try { rp.Documento = dr.GetString(5); } catch (Exception) { rp.Documento = ""; }
+                try { rp.Celular = dr.GetString(6); } catch (Exception) { rp.Celular = ""; }
                 result.Add(rp);
             }
             cn.Close();

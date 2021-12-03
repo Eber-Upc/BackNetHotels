@@ -27,5 +27,11 @@ namespace Objetos
         public int Dias { get; set; }
         public string Hoy { get; set; }
         public decimal Unitario { get; set; }
+        public string FechaReserva { get; set; }
+
+        public string Nombres { get; set; }
+        public string Apellidos { get; set; }
+        public string Estado { get; set; }
+        public int Id { get; set; }
     }
 }

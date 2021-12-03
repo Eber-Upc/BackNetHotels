@@ -6,6 +6,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Objetos;
 using WebApiHoteles.Models;
+using System.Net.Http;
+
+using System.Net.Http.Headers;
 
 namespace WebApiHoteles.Controllers
 {
@@ -275,6 +278,65 @@ namespace WebApiHoteles.Controllers
         }
 
 
+        [HttpPost]
+        [Route("api/SetClienteReserva")]
+        public Mensajes SetClienteReserva(Cliente Parametros)
+        {
+            Mensajes mensaje = new Mensajes();
+            try
+            {
+                Cliente data = new Cliente();
+                data.Reserva = Parametros.Reserva;
+                data.Nombre = Parametros.Nombre;
+                data.ApellidoP = Parametros.ApellidoP;
+                data.ApellidoM = Parametros.ApellidoM;
+                data.Mail = Parametros.Mail;
+                data.Documento = Parametros.Documento;
+                data.Celular = Parametros.Celular;
+
+                Modelo.SetClienteToCheking(data);
+                mensaje.Origen = "Cheking";
+                mensaje.Description = "Registro Cliente";
+                mensaje.Value = "Done";
+            }
+            catch (Exception)
+            {
+                mensaje.Origen = "Cheking";
+                mensaje.Description = "Registro Cliente";
+                mensaje.Value = "Error";
+            }
+
+            return mensaje;
+        }
+
+
+        //[HttpPost]
+        //[Route("api/GetClienteReserva")]
+        //public HttpResponseMessage GetClienteReserva(Cliente Parametros)
+        //{
+        //    var response = new HttpResponseMessage();
+        //    List<Cliente> lista = new List<Cliente>();
+        //    lista = Modelo.GetListaCliente(Parametros.Reserva);
+        //    string tbl = Helper.ListaClientes(lista);
+
+        //    response.Content = new StringContent(tbl);
+        //    response.Content.Headers.ContentType = new MediaTypeHeaderValue("text/html");
+        //    return response;
+        //}
+
+        [HttpPost]
+        [Route("api/GetClienteReserva")]
+        public Mensajes GetClienteReserva(Cliente Parametros)
+        {
+            List<Cliente> lista = new List<Cliente>();
+            lista = Modelo.GetListaCliente(Parametros.Reserva);
+            string tbl = Helper.ListaClientes(lista);
+
+            Mensajes msn = new Mensajes();
+            msn.Description = "Vista";
+            msn.Value = tbl;
+            return msn;
+        }
 
 
     }

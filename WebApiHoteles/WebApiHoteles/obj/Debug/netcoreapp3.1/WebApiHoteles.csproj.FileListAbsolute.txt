@@ -51,3 +51,6 @@ D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\WebApiHoteles\bin\Debug\netcoreapp3.1
 D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\WebApiHoteles\obj\Debug\netcoreapp3.1\WebApiHoteles.Views.pdb
 D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\WebApiHoteles\obj\Debug\netcoreapp3.1\WebApiHoteles.csproj.CopyComplete
 D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\WebApiHoteles\obj\Debug\netcoreapp3.1\WebApiHoteles.genruntimeconfig.cache
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\WebApiHoteles\obj\Debug\netcoreapp3.1\Razor\Views\Gestion\Index.cshtml.g.cs
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\WebApiHoteles\obj\Debug\netcoreapp3.1\Razor\Views\Gestion\Panel.cshtml.g.cs
+D:\UPC\Proyectos\Fuentes\Api\WebApiHoteles\WebApiHoteles\obj\Debug\netcoreapp3.1\Razor\Views\Gestion\CheckIng.cshtml.g.cs

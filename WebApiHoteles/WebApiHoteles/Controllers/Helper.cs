@@ -58,22 +58,30 @@ namespace WebApiHoteles.Controllers
         public string EnviarCorreo(string para, string contenido)
         {
             string Rsl = "";
-            MailMessage msg = new MailMessage();
-            msg.To.Add(new MailAddress(para));
-            msg.From = new MailAddress("u202010780@upc.edu.pe");
-            msg.Subject = "Confirmación - Recibo de Reserva";
-            msg.Body = contenido;
-            msg.IsBodyHtml = true;
+            try
+            {
+                MailMessage msg = new MailMessage();
+                msg.To.Add(new MailAddress(para));
+                msg.From = new MailAddress("Hoteles");
+                msg.Subject = "Confirmación - Recibo de Reserva";
+                msg.Body = contenido;
+                msg.IsBodyHtml = true;
 
-            SmtpClient client = new SmtpClient();
-            client.UseDefaultCredentials = false;
-            client.Credentials = new System.Net.NetworkCredential("u202010780@upc.edu.pe", "leD12@bc3");
-            client.Port = 587; // You can use Port 25 if 587 is blocked (mine is!)
-            client.Host = "smtp.office365.com";
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.EnableSsl = true;
-            client.Send(msg);
-            Rsl = "Done";
+                SmtpClient client = new SmtpClient();
+                client.UseDefaultCredentials = false;
+                client.Credentials = new System.Net.NetworkCredential("u202010780@upc.edu.pe", "leD12@bc3");
+                client.Port = 587; // You can use Port 25 if 587 is blocked (mine is!)
+                client.Host = "smtp.office365.com"; // smtp.office365.com
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.EnableSsl = true;
+                client.Send(msg);
+                Rsl = "Done";
+            }
+            catch (Exception)
+            {
+                Rsl = "Error";
+            }
+
             return Rsl;
         }
 
@@ -108,6 +116,44 @@ namespace WebApiHoteles.Controllers
             ";
         }
 
+        public string ListaClientes(List<Cliente> data)
+        {
+            int i = 1;
+            string dtll = "";
+            foreach(var dato in data)
+            {
+                dtll = dtll + @"
+                <tr>
+                  <th>"+i+ @"</th>
+                  <td>" + dato.Nombre + @"</td>
+                  <td>" + dato.ApellidoP + @"</td>
+                  <td>" + dato.ApellidoM + @"</td>
+                  <td>" + dato.Documento + @"</td>
+                  <td>" + dato.Mail + @"</td>
+                  <td>" + dato.Celular + @"</td>
+                </tr>
+                ";
+            }
+
+            return @"
+            <table class='table'>
+              <thead>
+                <tr>
+                  <th scope='col'>#</th>
+                  <th scope='col'>Nombre</th>
+                  <th scope='col'>Apellido Paterno</th>
+                  <th scope='col'>Apellido Materno</th>
+                 <th scope='col'>Documento</th>
+                 <th scope='col'>Email</th>
+                 <th scope='col'>Celular</th>
+                </tr>
+              </thead>
+              <tbody>
+                "+ dtll + @"
+              </tbody>
+            </table>
+            ";
+        }
 
     }
 }

@@ -29,6 +29,10 @@ namespace WebApiHoteles.Controllers
 
 
 
+
+
+
+
         public IActionResult Privacy()
         {
             return View();

@@ -1,0 +1,184 @@
+﻿@{
+    int i = 1;
+}
+<div>
+    <div>
+        <label style="font-size:44px;font-weight:bold">Cheking.</label><br />
+        <label style="font-size:18px;margin-top:-15px">Seleccione una reserva para realizar el ingreso.</label>
+    </div>
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Habitacion</th>
+                    <th scope="col">Numero Hab.</th>
+                    <th scope="col">Entrada</th>
+                    <th scope="col">Salida</th>
+                    <th scope="col">Huespedes</th>
+                    <th scope="col">Fecha Reserva</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Agregar</th>
+                    <th scope="col">Lista</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var dato in ViewBag.ListaReservas)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@dato.Nombres  @dato.Apellidos</td>
+                        <td>@dato.Habitacion</td>
+                        <td>@dato.Room</td>
+                        <td>@dato.Inicio</td>
+                        <td>@dato.Fin </td>
+                        <td>@dato.Huespedes</td>
+                        <td>@dato.FechaReserva</td>
+                        <td>S/.@dato.Monto</td>
+                        <td>@dato.Estado</td>
+                        <td><i class="fas fa-user-plus" style="font-size: 20px; color: #3498db" onclick="OpenRegistro(@dato.Id)"></i></td>
+                        <td><i class="fas fa-users" style="font-size: 20px; color: #3498db" onclick="OpenListaClient(@dato.Id)"></i></td>
+                    </tr>
+                    i++;
+                }
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="ModelInsertPersona" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ingresar Persona</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input id="idtRs" style="display:none" />
+                <label for="exampleInputEmail1" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombre">
+                <label for="exampleInputEmail1" class="form-label">Apellido Paterno</label>
+                <input type="text" class="form-control" id="apellidoP">
+                <label for="exampleInputEmail1" class="form-label">Apellido Materno</label>
+                <input type="text" class="form-control" id="apellidoM">
+                <label for="exampleInputEmail1" class="form-label">Correo electronico</label>
+                <input type="email" class="form-control" id="correo">
+
+                <label for="exampleInputEmail1" class="form-label">Número documento</label>
+                <input type="text" class="form-control" id="numDoc">
+                <label for="exampleInputEmail1" class="form-label">Número Celular</label>
+                <input type="text" class="form-control" id="celnum">
+                <div style="min-height:30px"></div>
+                <a class="btn btn-primary" href="#" role="button" onclick="InsertPersona()">Registrar Persona</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="ModelListaPersona" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Lista de Personas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="listCli">
+               
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function OpenRegistro(idt) {
+        $("#ModelInsertPersona").modal("show");
+        document.getElementById("idtRs").value = idt;
+    }
+    function InsertPersona() {
+        let idt = parseInt(document.getElementById("idtRs").value);
+        let nombre = document.getElementById("nombre").value;
+        let apellidoP = document.getElementById("apellidoP").value;
+        let äpellidoM = document.getElementById("apellidoM").value;
+        let Mail = document.getElementById("correo").value;
+        let NumDoc = document.getElementById("numDoc").value;
+        let Celular = document.getElementById("celnum").value;
+
+        var params = {
+            Reserva: idt,
+            Nombre: nombre,
+            ApellidoP: apellidoP,
+            ApellidoM: äpellidoM,
+            Mail: Mail,
+            Documento: NumDoc,
+            Celular: Celular,
+            Reserva: idt
+        };
+        var xmlhttp = new XMLHttpRequest();
+        var theUrl = "/api/SetClienteReserva";
+        xmlhttp.open("POST", theUrl);
+        xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlhttp.send(JSON.stringify(params));
+        xmlhttp.responseType = 'json';
+        xmlhttp.onload = function () {
+            if (xmlhttp.status != 200) {
+                console.log("Error")
+            } else {
+                let rs = xmlhttp.response;
+                console.log(xmlhttp.response);
+                console.log(rs["value"]);
+                if (rs["value"] == "Done") {
+                    clearForm();
+                }
+
+            }
+        };
+
+
+
+    }
+
+
+    function clearForm() {
+        document.getElementById("nombre").value = "";
+        document.getElementById("apellidoP").value = "";
+        document.getElementById("apellidoM").value = "";
+        document.getElementById("correo").value = "";
+        document.getElementById("numDoc").value = "";
+        document.getElementById("celnum").value = "";
+    }
+
+    function OpenListaClient(idt) {
+        $("#ModelListaPersona").modal("show");
+        var params = {
+            Reserva: idt
+        };
+        var xmlhttp = new XMLHttpRequest();
+        var theUrl = "/api/GetClienteReserva";
+        xmlhttp.open("POST", theUrl);
+        xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xmlhttp.send(JSON.stringify(params));
+        xmlhttp.responseType = 'json';
+        xmlhttp.onload = function () {
+            if (xmlhttp.status != 200) {
+                console.log("Error")
+            } else {
+                
+                let dto = xmlhttp.response;
+                console.log(xmlhttp.response[0]);
+                document.getElementById("listCli").innerHTML = dto["value"];
+
+            }
+        };
+    }
+</script>
